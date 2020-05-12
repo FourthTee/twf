@@ -1,7 +1,7 @@
 import networkx as nx
 import math
 
-items_weights = [3, 2, 8, 12, 25, 15, 500, 1, 2]
+items_weights = [3, 2, 8, 12, 25, 15, .5, 1, 2]
 
 def createGraph():
 
@@ -28,7 +28,7 @@ def solve(potentialStart, items):
         for start in potentialStart:
             paths = nx.all_simple_paths(G, source=start, target=0)
             for path in map(nx.utils.pairwise, paths):
-                path_cost = cost(G, path, items, start, find_weight(items, start))
+                path_cost = cost(G, path, items, start)
                 if path_cost < min_cost:
                     min_cost = path_cost
     if (len(potentialStart) == 2):
@@ -41,7 +41,7 @@ def solve(potentialStart, items):
             if second not in path:
                 #need to add 0 to second to 0
                 path_tuple = nx.utils.pairwise(path)
-                path_cost = cost(G, path_tuple, items, first, find_weight(items, first))
+                path_cost = cost(G, path_tuple, items, first)
 
                 #cost to go from 0 to second
                 edge_weight = G.get_edge_data(0, second)
@@ -50,13 +50,14 @@ def solve(potentialStart, items):
                 #cost from second back to 0
                 aug_path = []
                 aug_path.append(tuple((second, 0)))
-                path_cost += cost(G, aug_path, items, second, find_weight(items, second))
+                path_cost += cost(G, aug_path, items, second)
                 if path_cost < min_cost:
                     min_cost = path_cost
 
             else:
                 path_tuple = nx.utils.pairwise(path)
-                path_cost = cost(G, path_tuple, items, first, find_weight(items, first))
+                #print(list(path_tuple))
+                path_cost = cost(G, path_tuple, items, first)
                 if path_cost < min_cost:
                     min_cost = path_cost
         
@@ -66,7 +67,7 @@ def solve(potentialStart, items):
             if first not in path:
                 #need to add 0 to second to 0
                 path_tuple = nx.utils.pairwise(path)
-                path_cost = cost(G, path_tuple, items, second, find_weight(items, second))
+                path_cost = cost(G, path_tuple, items, second)
 
                 #cost to go from 0 to second
                 edge_weight = G.get_edge_data(0, first)
@@ -75,13 +76,13 @@ def solve(potentialStart, items):
                 #cost from second back to 0
                 aug_path = []
                 aug_path.append(tuple((first, 0)))
-                path_cost += cost(G, aug_path, items, first, find_weight(items, first))
+                path_cost += cost(G, aug_path, items, first)
                 if path_cost < min_cost:
                     min_cost = path_cost
 
             else:
                 path_tuple = nx.utils.pairwise(path)
-                path_cost = cost(G, path_tuple, items, second, find_weight(items, second))
+                path_cost = cost(G, path_tuple, items, second)
                 if path_cost < min_cost:
                     min_cost = path_cost
 
@@ -96,20 +97,21 @@ def solve(potentialStart, items):
     return min_cost
 
 
-def cost(G, path, items, start, weight):
+def cost(G, path, items, start):
 
     cost = 0
-    itemWeight = weight
-    for edge in path:
+    itemWeight = 0
+    #print(path)
+    for edge in list(path):
         v1 = edge[0]
         v2 = edge[1]
+        itemWeight += find_weight(items, v1)
         edge_weight = G.get_edge_data(v1, v2)
         if itemWeight <= 5:
             cost += 10 * edge_weight['weight']
         else:
             additional = math.ceil((itemWeight - 5) / 5) * 8
             cost = cost + (10 + additional)*edge_weight['weight']
-    
     return cost
 
 
