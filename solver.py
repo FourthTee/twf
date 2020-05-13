@@ -173,7 +173,29 @@ def find_weight(items, location):
     
     return weight
     
-        
+
+def api_solve(string_inp):
+    lst = list(string_inp.split(" "))
+    lst = list(map(int, lst))
+    
+    set1 = lst[0:3]
+    set2 = lst[3:6]
+    set3 = lst[6:]
+
+    potenStart = []
+
+    if any(set1):
+        potenStart.append(1)
+    
+    if any(set2):
+        potenStart.append(2)
+    
+    if any(set3):
+        potenStart.append(3)
+
+    min_cost = solve(potenStart, lst)
+
+    return min_cost
 
 
 #main function
