@@ -50,13 +50,13 @@ def solve(potentialStart, items):
                 #cost from second back to 0
                 aug_path = []
                 aug_path.append(tuple((second, 0)))
-                path_cost += cost(G, aug_path, items, second)
+                c = cost(G, aug_path, items, second)
+                path_cost += c
                 if path_cost < min_cost:
                     min_cost = path_cost
 
             else:
                 path_tuple = nx.utils.pairwise(path)
-                #print(list(path_tuple))
                 path_cost = cost(G, path_tuple, items, first)
                 if path_cost < min_cost:
                     min_cost = path_cost
@@ -86,15 +86,52 @@ def solve(potentialStart, items):
                 if path_cost < min_cost:
                     min_cost = path_cost
 
+    if len(potentialStart) == 3:
+
+        #Start at 1
+        first_paths = []
+        first_paths.append([1, 0, 2, 0, 3, 0])
+        first_paths.append([1, 0, 2, 3, 0])
+        first_paths.append([1, 0, 3, 2, 0])
+        first_paths.append([1, 2, 3, 0])
+        first_paths.append([1, 2, 0, 3, 0])
+        
+        for path in first_paths:
+            first_tuple = nx.utils.pairwise(path)
+            path_cost = cost(G, first_tuple, items, 1)
+            if path_cost < min_cost:
+                    min_cost = path_cost
 
 
 
-                
+        #Start at 2
+        second_paths = []
+        second_paths.append([2, 0, 1, 0, 3, 0])
+        second_paths.append([2, 1, 0, 3, 0])
+        second_paths.append([2, 3, 0, 1, 0])
+
+        for path in second_paths:
+            second_tuple = nx.utils.pairwise(path)
+            path_cost = cost(G, second_tuple, items, 1)
+            if path_cost < min_cost:
+                    min_cost = path_cost
 
 
+        #Start at 3
+        third_paths = []
+        third_paths.append([3, 0, 2, 0, 1, 0])
+        third_paths.append([3, 0, 2, 1, 0])
+        third_paths.append([3, 0, 1, 2, 0])
+        third_paths.append([3, 2, 1, 0])
+        third_paths.append([3, 2, 0, 1, 0])
 
+        for path in first_paths:
+            third_tuple = nx.utils.pairwise(path)
+            path_cost = cost(G, third_tuple, items, 1)
+            if path_cost < min_cost:
+                    min_cost = path_cost
     
-    return min_cost
+    return int(min_cost)
 
 
 def cost(G, path, items, start):
@@ -106,12 +143,15 @@ def cost(G, path, items, start):
         v1 = edge[0]
         v2 = edge[1]
         itemWeight += find_weight(items, v1)
+        if v1 == 0:
+            itemWeight = 0
         edge_weight = G.get_edge_data(v1, v2)
         if itemWeight <= 5:
             cost += 10 * edge_weight['weight']
         else:
             additional = math.ceil((itemWeight - 5) / 5) * 8
             cost = cost + (10 + additional)*edge_weight['weight']
+        #print(cost)
     return cost
 
 
@@ -141,11 +181,17 @@ def find_weight(items, location):
 if __name__ == '__main__':
         
     lst = [] 
-  
-    # iterating till the range 
-    for i in range(0, 9): 
-        ele = int(input()) 
-        lst.append(ele) # adding the element
+    
+    print("Input the amount of each item: ")
+    inp = input()
+    try:
+        lst = list(inp.split(" "))
+        assert len(lst) == 9
+    except AssertionError:
+        print("Wrong Input Format")
+        quit()
+
+    lst = list(map(int, lst))
     
     set1 = lst[0:3]
     set2 = lst[3:6]
@@ -164,5 +210,5 @@ if __name__ == '__main__':
 
     min_cost = solve(potenStart, lst)
 
-    print(min_cost)
+    print("Min Cost: "+ str(min_cost))
 
